@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yogurt Business Project</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600;1,700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+:root{
+  --lav:#c5b8f0;--lav-l:#ede8fb;
+  --sky:#b3d9f7;--sky-l:#e8f5fe;
+  --mint:#b8edd8;--mint-l:#e4f8f0;
+  --peach:#f7d5c4;--peach-l:#fdf0eb;
+  --white:#ffffff;--cream:#fdfcff;
+  --dark:#1c1828;--mid:#5a5270;--light:#9b94b5;
+  --r-sm:14px;--r-md:22px;--r-lg:32px;
+  --sh-sm:0 4px 20px rgba(100,80,160,.08);
+  --sh-md:0 10px 40px rgba(100,80,160,.14);
+  --sh-lg:0 24px 64px rgba(100,80,160,.22);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--dark);overflow-x:hidden}
+nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:0 5%;height:66px;background:rgba(255,255,255,.88);backdrop-filter:blur(20px);border-bottom:1px solid rgba(197,184,240,.15);transition:box-shadow .3s}
+nav.scrolled{box-shadow:var(--sh-sm)}
+.nav-logo{font-family:'Cormorant Garamond',serif;font-size:1.35rem;font-weight:700;color:var(--dark);display:flex;align-items:center;gap:8px}
+.nav-links{display:flex;gap:4px;list-style:none}
+.nav-links a{text-decoration:none;font-size:.81rem;font-weight:500;color:var(--mid);padding:6px 13px;border-radius:50px;transition:all .2s}
+.nav-links a:hover,.nav-links a.active{background:var(--lav-l);color:var(--dark)}
+.nav-toggle{display:none;background:none;border:none;cursor:pointer;flex-direction:column;gap:5px;padding:4px}
+.nav-toggle span{width:23px;height:2px;background:var(--dark);border-radius:2px;transition:.3s}
+#hero{position:relative;width:100%;height:100vh;overflow:hidden;background:#0e0c18}
+.slide{position:absolute;inset:0;display:flex;align-items:center;opacity:0;pointer-events:none;transition:opacity .65s ease,transform .65s ease;transform:translateX(56px)}
+.slide.active{opacity:1;pointer-events:all;transform:translateX(0)}
+.slide.exit{opacity:0;transform:translateX(-56px);pointer-events:none}
+.slide-bg{position:absolute;inset:0;z-index:0;background-size:cover;background-position:center;transition:transform 8s ease}
+.slide.active .slide-bg{transform:scale(1.04)}
+.slide-bg::after{content:'';position:absolute;inset:0;background:linear-gradient(105deg,rgba(14,12,24,.88) 45%,rgba(14,12,24,.2) 100%)}
+.slide-body{position:relative;z-index:2;padding:0 6%;margin-top:66px;max-width:680px}
+.slide-tag{display:inline-block;font-size:.68rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.18);padding:5px 14px;border-radius:50px;margin-bottom:22px;backdrop-filter:blur(6px)}
+.slide-title{font-family:'Cormorant Garamond',serif;font-size:clamp(2.4rem,5.5vw,4.8rem);line-height:1.05;color:#fff;font-weight:700;margin-bottom:20px;letter-spacing:-.02em}
+.slide-title em{font-style:italic;color:#d5c9ff}
+.slide-desc{font-size:clamp(.88rem,1.4vw,1rem);color:rgba(255,255,255,.7);line-height:1.78;max-width:460px;margin-bottom:32px}
+.slide-stats{display:flex;gap:20px;flex-wrap:wrap;margin-bottom:36px}
+.s-stat{background:rgba(255,255,255,.1);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.14);border-radius:var(--r-sm);padding:13px 20px}
+.s-stat-num{font-family:'Cormorant Garamond',serif;font-size:1.75rem;font-weight:700;color:#fff;line-height:1}
+.s-stat-lbl{font-size:.68rem;color:rgba(255,255,255,.5);margin-top:4px;font-weight:500}
+.btn-hero{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#9080d8,#60aaf0);color:#fff;font-size:.86rem;font-weight:600;padding:13px 26px;border-radius:50px;text-decoration:none;border:none;cursor:pointer;box-shadow:0 8px 28px rgba(110,138,200,.4);transition:transform .25s,box-shadow .25s}
+.btn-hero:hover{transform:translateY(-3px);box-shadow:0 14px 36px rgba(110,138,200,.5)}
+.btn-ghost{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.1);backdrop-filter:blur(8px);color:#fff;font-size:.86rem;font-weight:600;padding:13px 26px;border-radius:50px;text-decoration:none;border:1px solid rgba(255,255,255,.22);margin-left:10px;transition:all .25s}
+.btn-ghost:hover{background:rgba(255,255,255,.2)}
+.slide-nav{position:absolute;bottom:38px;left:6%;display:flex;align-items:center;gap:14px;z-index:10}
+.s-arrow{width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,.1);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.18);color:#fff;font-size:1.05rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.s-arrow:hover{background:rgba(255,255,255,.25)}
+.dots-wrap{display:flex;gap:7px;align-items:center}
+.dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.28);cursor:pointer;transition:all .3s}
+.dot.on{width:24px;border-radius:4px;background:#fff}
+.s-count{font-size:.76rem;font-weight:600;color:rgba(255,255,255,.35);margin-left:6px;letter-spacing:.05em}
+.slide-progress{position:absolute;top:0;left:0;height:3px;background:linear-gradient(90deg,#a090e0,#60aaf0);z-index:300;transition:width .1s linear}
+#content{background:var(--cream)}
+section.cs{padding:96px 6% 80px}
+section.cs:nth-child(even){background:var(--white)}
+.tag{display:inline-block;font-size:.68rem;font-weight:700;letter-spacing:.11em;text-transform:uppercase;color:#8a78c8;background:var(--lav-l);padding:5px 14px;border-radius:50px;margin-bottom:16px}
+h2.st{font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,4vw,3rem);line-height:1.15;color:var(--dark);margin-bottom:14px;letter-spacing:-.02em}
+.sd{font-size:.96rem;color:var(--mid);max-width:560px;line-height:1.78}
+.ag{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center;margin-top:52px}
+.aphoto{width:100%;aspect-ratio:4/5;object-fit:cover;border-radius:var(--r-lg);box-shadow:var(--sh-lg);display:block}
+.atext p{color:var(--mid);line-height:1.82;margin-bottom:18px;font-size:.95rem}
+.chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px}
+.chip{background:var(--lav-l);color:#6a5aaf;padding:7px 16px;border-radius:50px;font-size:.78rem;font-weight:600}
+.chip.s{background:var(--sky-l);color:#3a8abf}.chip.m{background:var(--mint-l);color:#2a8a6a}.chip.p{background:var(--peach-l);color:#c0623c}
+
+/* ── VIDEO SECTION ── */
+.video-section{background:linear-gradient(160deg,#1c1828,#2a2050);padding:80px 6%;text-align:center}
+.video-section .tag{background:rgba(197,184,240,.15);color:#c5b8f0}
+.video-section h2.st{color:#fff}
+.video-section .sd{color:rgba(255,255,255,.62);margin:0 auto 44px}
+.video-wrap{max-width:860px;margin:0 auto;border-radius:var(--r-lg);overflow:hidden;box-shadow:0 32px 80px rgba(0,0,0,.55);border:1px solid rgba(197,184,240,.18)}
+.video-wrap video{width:100%;display:block;background:#000;aspect-ratio:16/9;object-fit:contain}
+
+.bmcg{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:48px}
+.bc{background:var(--white);border-radius:var(--r-md);padding:24px;box-shadow:var(--sh-sm);border:1px solid rgba(197,184,240,.2);transition:transform .3s,box-shadow .3s;opacity:0;transform:translateY(18px)}
+.bc.vi{opacity:1;transform:translateY(0)}.bc:hover{transform:translateY(-5px);box-shadow:var(--sh-md)}
+.bci{width:42px;height:42px;border-radius:12px;background:var(--lav-l);display:flex;align-items:center;justify-content:center;font-size:1.25rem;margin-bottom:14px}
+.bct{font-size:.67rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--light);margin-bottom:8px}
+.bch{font-family:'Cormorant Garamond',serif;font-size:1.13rem;font-weight:700;margin-bottom:10px;color:var(--dark)}
+.bcb{font-size:.82rem;color:var(--mid);line-height:1.72}.bcb ul{padding-left:15px}.bcb li{margin-bottom:4px}
+.pr{display:flex;gap:0;margin-top:48px;flex-wrap:wrap}
+.ps{flex:1;min-width:150px;background:var(--lav-l);border-radius:var(--r-md);padding:28px 20px;text-align:center;transition:transform .25s;opacity:0;transform:translateY(18px)}
+.ps.vi{opacity:1;transform:translateY(0)}.ps:nth-child(2){background:var(--sky-l)}.ps:nth-child(4){background:var(--mint-l)}.ps:nth-child(6){background:var(--peach-l)}.ps:hover{transform:translateY(-6px)}
+.pc{width:28px;display:flex;align-items:center;justify-content:center;color:var(--light);font-size:1.05rem;flex-shrink:0}
+.pn{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.8);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.83rem;margin:0 auto 10px}
+.pe{font-size:1.9rem;margin-bottom:10px}.pti{font-weight:700;font-size:.87rem;margin-bottom:6px;color:var(--dark)}.pde{font-size:.76rem;color:var(--mid);line-height:1.6}
+.prg{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:36px}
+.prc{border-radius:var(--r-md);padding:24px;background:var(--white);box-shadow:var(--sh-sm);border:1.5px solid rgba(197,184,240,.2);opacity:0;transform:translateY(18px);transition:transform .3s,box-shadow .3s}
+.prc.vi{opacity:1;transform:translateY(0)}.prc:hover{transform:translateY(-4px);box-shadow:var(--sh-md)}
+.pl{display:inline-flex;align-items:center;gap:5px;font-size:.69rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;padding:4px 12px;border-radius:50px;margin-bottom:10px}
+.pl.pp{background:#fee2e2;color:#dc2626}.pl.ps{background:#dcfce7;color:#16a34a}
+.prt{font-weight:700;font-size:.87rem;margin-bottom:6px;color:var(--dark)}.prd{font-size:.81rem;color:var(--mid);line-height:1.65}.par{text-align:center;font-size:1.3rem;color:var(--light);margin:10px 0}
+.fcs{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin:40px 0}
+.fc{background:var(--white);border-radius:var(--r-md);padding:24px;box-shadow:var(--sh-sm);border-top:4px solid transparent;text-align:center;transition:transform .25s;opacity:0;transform:translateY(18px)}
+.fc.vi{opacity:1;transform:translateY(0)}.fc:hover{transform:translateY(-5px)}
+.fc:nth-child(1){border-color:var(--sky)}.fc:nth-child(2){border-color:var(--mint)}.fc:nth-child(3){border-color:var(--peach)}.fc:nth-child(4){border-color:var(--lav)}
+.fi{font-size:1.85rem;margin-bottom:10px}.fl{font-size:.71rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--light);margin-bottom:8px}
+.fv{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:700;color:var(--dark)}.fs{font-size:.72rem;color:var(--light);margin-top:4px}
+.chrow{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.chc{background:var(--white);border-radius:var(--r-md);padding:28px;box-shadow:var(--sh-sm)}
+.cht{font-weight:700;font-size:.97rem;color:var(--dark);margin-bottom:4px}.chs{font-size:.77rem;color:var(--light);margin-bottom:20px}
+.fg{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:40px}
+.fucard{border-radius:var(--r-md);padding:24px;box-shadow:var(--sh-sm);transition:transform .25s;opacity:0;transform:scale(.96);background:linear-gradient(135deg,var(--lav-l),var(--sky-l))}
+.fucard.vi{opacity:1;transform:scale(1)}.fucard:nth-child(2){background:linear-gradient(135deg,var(--sky-l),var(--mint-l))}.fucard:nth-child(3){background:linear-gradient(135deg,var(--mint-l),var(--peach-l))}.fucard:nth-child(4){background:linear-gradient(135deg,var(--peach-l),var(--lav-l))}.fucard:nth-child(5){background:linear-gradient(135deg,var(--lav-l),var(--peach-l))}.fucard:hover{transform:translateY(-6px)}
+.fue{font-size:1.85rem;margin-bottom:12px}.fut{font-weight:700;font-size:.92rem;color:var(--dark);margin-bottom:6px}.fud{font-size:.8rem;color:var(--mid);line-height:1.65}
+.tg{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-top:48px}
+.mc{background:var(--white);border-radius:var(--r-md);overflow:hidden;box-shadow:var(--sh-sm);border:1px solid rgba(197,184,240,.18);transition:transform .3s,box-shadow .3s;opacity:0;transform:translateY(18px)}
+.mc.vi{opacity:1;transform:translateY(0)}.mc:hover{transform:translateY(-8px);box-shadow:var(--sh-md)}
+.mphoto{width:100%;aspect-ratio:1/1;object-fit:cover;display:block;filter:saturate(.9);transition:filter .3s}.mc:hover .mphoto{filter:saturate(1.1)}
+.minfo{padding:18px 16px}.mid-txt{font-size:.67rem;color:var(--light);font-weight:600;margin-bottom:5px;letter-spacing:.04em}
+.mname{font-family:'Cormorant Garamond',serif;font-size:1.06rem;font-weight:700;color:var(--dark);line-height:1.2}
+#conclusion{background:linear-gradient(135deg,#1c1828,#2a2050);color:#fff;text-align:center;padding:100px 6% 80px}
+#conclusion .tag{background:rgba(197,184,240,.15);color:#c5b8f0}
+#conclusion h2.st{color:#fff}
+#conclusion .sd{color:rgba(255,255,255,.62);max-width:660px;margin:0 auto}
+.cg{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin:52px auto 0;max-width:860px}
+.cpt{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:var(--r-md);padding:32px 22px;backdrop-filter:blur(8px);transition:background .25s}
+.cpt:hover{background:rgba(255,255,255,.1)}.cpe{font-size:2rem;margin-bottom:14px}.cpt-t{font-weight:700;font-size:.92rem;margin-bottom:8px;color:rgba(255,255,255,.9)}.cpt-d{font-size:.81rem;color:rgba(255,255,255,.52);line-height:1.68}
+footer{background:#130f20;text-align:center;padding:24px;font-size:.75rem;color:rgba(255,255,255,.28)}
+.fu{opacity:0;transform:translateY(22px);transition:opacity .55s ease,transform .55s ease}.fu.vi{opacity:1;transform:translateY(0)}
+@media(max-width:960px){.ag{grid-template-columns:1fr}.bmcg,.fcs{grid-template-columns:repeat(2,1fr)}.chrow,.tg,.cg{grid-template-columns:1fr 1fr}.prg{grid-template-columns:1fr}.fg{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:640px){
+  nav{padding:0 4%}.nav-links{display:none;flex-direction:column;position:fixed;top:66px;left:0;right:0;background:rgba(255,255,255,.97);padding:14px;gap:4px;border-bottom:1px solid rgba(197,184,240,.2)}.nav-links.open{display:flex}.nav-toggle{display:flex}
+  section.cs{padding:72px 4% 56px}.pr{flex-direction:column}.pc{transform:rotate(90deg);width:100%;height:24px}.fcs{grid-template-columns:1fr 1fr}.tg{grid-template-columns:1fr 1fr}.fg{grid-template-columns:1fr}.cg{grid-template-columns:1fr}.chrow{grid-template-columns:1fr}
+  .slide-title{font-size:2rem}.slide-body{padding:0 4%}.slide-stats{gap:12px}.slide-nav{left:4%;bottom:22px}.s-stat-num{font-size:1.3rem}
+  .video-section{padding:60px 4%}
+}
+</style>
+</head>
+<body>
+
+<nav id="navbar">
+  <div class="nav-logo">🍦 Homemade Yogurt</div>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="#hero">Home</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#video">Video</a></li>
+    <li><a href="#bmc">BMC</a></li>
+    <li><a href="#process">Process</a></li>
+    <li><a href="#data">Data</a></li>
+    <li><a href="#team">Team</a></li>
+    <li><a href="#conclusion">Conclusion</a></li>
+  </ul>
+  <button class="nav-toggle" id="navToggle"><span></span><span></span><span></span></button>
+</nav>
+
+<div class="slide-progress" id="progress"></div>
+
+<div id="hero">
+  <div class="slide active" id="s0">
+    <div class="slide-bg" style="background-image:url('https://scontent.fbkk22-6.fna.fbcdn.net/v/t1.15752-9/662445294_4790767137817148_2447779577113129548_n.jpg?_nc_cat=104&ccb=1-7&_nc_sid=9f807c&_nc_eui2=AeFTZPfhbleeWkkohfhiA6nh-6-hQYCdtA_7r6FBgJ20D0cY7C879ykWjOVTO0RhwiJxo5w06L9oqgEwRkEiERsb&_nc_ohc=6FjXHE02jjIQ7kNvwE05luX&_nc_oc=AdquWrs7l_8x6l1hX54JvAxMNFFno-iaxf5Gi7cVUw-ggLkXptQO_aownGUIECOKDnI&_nc_zt=23&_nc_ht=scontent.fbkk22-6.fna&_nc_ss=7a3a8&oh=03_Q7cD5AEyIKBm-jWwg_f9vArpIkgwq0Ur14jmvHwb74VZvYwGyg&oe=69F87F0B')"></div>
+    <div class="slide-body">
+      <div class="slide-tag">🎓 MODERN MANAGEMENT PROJECT · 2026</div>
+      <h1 class="slide-title">Homemade<br><em>Yogurt</em><br>Business</h1>
+      <p class="slide-desc">A small business project focused on selling affordable, healthy, and refreshing homemade frozen yogurt.</p>
+      <div class="slide-stats">
+        <div class="s-stat"><div class="s-stat-num">8,014 ฿</div><div class="s-stat-lbl">Revenue</div></div>
+        <div class="s-stat"><div class="s-stat-num">3,326 ฿</div><div class="s-stat-lbl">Net Profit</div></div>
+        <div class="s-stat"><div class="s-stat-num">7 ฿</div><div class="s-stat-lbl">Per Cup</div></div>
+        <div class="s-stat"><div class="s-stat-num">4</div><div class="s-stat-lbl">Members</div></div>
+      </div>
+      <a href="#about" class="btn-hero">Explore Project ↓</a>
+      <a href="#data" class="btn-ghost">📊 See Results</a>
+    </div>
+  </div>
+  <div class="slide" id="s1">
+    <div class="slide-bg" style="background-image:url('https://scontent.fbkk22-1.fna.fbcdn.net/v/t1.15752-9/659103023_1638684667370449_2548387959046813494_n.jpg?_nc_cat=101&ccb=1-7&_nc_sid=9f807c&_nc_eui2=AeHt7bY-tMe8Posy7fhKowuuqMcx0KZE5WeoxzHQpkTlZ4FBSQ4niWt8J6cmCTEMfu9IPY07U-pfCiMqPX7k9GfT&_nc_ohc=dR1qUzsKv3MQ7kNvwGRNpaP&_nc_oc=AdoLxRE6ZE15fQwPYaNVKqP9qOIs497dXa31NJkSA-Pk-teLumfnMe0Qdn9xqsR4kwc&_nc_zt=23&_nc_ht=scontent.fbkk22-1.fna&_nc_ss=7a3a8&oh=03_Q7cD5AHjWgKsXeAWzuqIAZ3FmCJKb1VXtsgLCYjUWIqmwlgfdg&oe=69F87137')"></div>
+    <div class="slide-body">
+      <div class="slide-tag">📖 About the Project</div>
+      <h2 class="slide-title">Sold in a<br><em>Primary</em><br>Schools</h2>
+      <p class="slide-desc">Our homemade frozen yogurt was carefully prepared, packaged, and sold to primary school students as part of a real business learning experience.</p>
+      <a href="#about" class="btn-hero">Read More →</a>
+    </div>
+  </div>
+  <div class="slide" id="s2">
+    <div class="slide-bg" style="background-image:url('https://scontent.fbkk22-4.fna.fbcdn.net/v/t1.15752-9/659219794_2802455823426907_4394284663803708723_n.jpg?_nc_cat=106&ccb=1-7&_nc_sid=9f807c&_nc_eui2=AeGeiLllnqN4Bn8lmZ6ET7K1gf85Q69GZmuB_zlDr0Zmaym8NxmGE4yGzjPgQkz7bwwLabDyxCKDFvF4cLtR0wCm&_nc_ohc=wuLeJeaJbwYQ7kNvwGrVExD&_nc_oc=AdoywwPQJvzqZjZp0BHYKsLgXDu2KK_KfZkOp3V0LWh6wTJOBhnRHbwlwULKE1h0-40&_nc_zt=23&_nc_ht=scontent.fbkk22-4.fna&_nc_ss=7a3a8&oh=03_Q7cD5AGz8UljVSegl5P00_dTJslSdd205rJ9m-FWlV0eT9BWlQ&oe=69F87B78')"></div>
+    <div class="slide-body">
+      <div class="slide-tag">💎 Value Proposition</div>
+      <h2 class="slide-title">Only<br><em>7 Baht</em><br>per Cup</h2>
+      <p class="slide-desc">A sweet and cool treat at a student-friendly price.</p>
+      <div class="slide-stats">
+        <div class="s-stat"><div class="s-stat-num">Retail 7 ฿</div><div class="s-stat-lbl">Per cup</div></div>
+        <div class="s-stat"><div class="s-stat-num">Wholesale 6 ฿</div><div class="s-stat-lbl">Bulk orders</div></div>
+      </div>
+      <a href="#bmc" class="btn-hero">Business Model →</a>
+    </div>
+  </div>
+  <div class="slide" id="s3">
+    <div class="slide-bg" style="background-image:url('https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=1800&q=80')"></div>
+    <div class="slide-body">
+      <div class="slide-tag">📊 Financial Results</div>
+      <h2 class="slide-title">Real<br><em>Profit</em><br>Generated</h2>
+      <p class="slide-desc">Our homemade yogurt business successfully turned small sales into real profit.</p>
+      <div class="slide-stats">
+        <div class="s-stat"><div class="s-stat-num">4,000 ฿</div><div class="s-stat-lbl">Investment</div></div>
+        <div class="s-stat"><div class="s-stat-num">8,014 ฿</div><div class="s-stat-lbl">Revenue</div></div>
+        <div class="s-stat"><div class="s-stat-num">+3,326 ฿</div><div class="s-stat-lbl">Profit</div></div>
+      </div>
+      <a href="#data" class="btn-hero">Full Analysis →</a>
+    </div>
+  </div>
+  <div class="slide" id="s4">
+    <div class="slide-bg" style="background-image:url('https://scontent.fbkk22-6.fna.fbcdn.net/v/t1.15752-9/664347145_898347409700995_5373412610692436114_n.jpg?_nc_cat=102&ccb=1-7&_nc_sid=9f807c&_nc_eui2=AeHaP3C2FOUExsEtg6LrEi_tH26cxo8Z_bsfbpzGjxn9u-Yhe7Mx6zlMsnxnVS1Jmz8Yo0PbqYPSzMg-frj93eWJ&_nc_ohc=-GINigt9xnUQ7kNvwHmk-Kf&_nc_oc=Ado2QVP9pZrBEOFidI6NM_IWJj1rhLGywNnzpbnQi0y9oT3ie4xgug2OJygP56_kj3Y&_nc_zt=23&_nc_ht=scontent.fbkk22-6.fna&_nc_ss=7a3a8&oh=03_Q7cD5AEdhbTNOa-VeBx2GDz9HYeEg3Ij-LXnddAJnNlno_8NGQ&oe=69F88D62')"></div>
+    <div class="slide-body">
+      <div class="slide-tag">👥 The Team</div>
+      <h2 class="slide-title">4 Students.<br><em>1 Vision.</em></h2>
+      <p class="slide-desc">Four students united by one goal — creating a successful frozen yogurt business.</p>
+      <a href="#team" class="btn-hero">Meet the Team →</a>
+    </div>
+  </div>
+  <div class="slide-nav">
+    <button class="s-arrow" id="prevBtn">←</button>
+    <div class="dots-wrap" id="dotsWrap"></div>
+    <button class="s-arrow" id="nextBtn">→</button>
+    <span class="s-count" id="sCount">1 / 5</span>
+  </div>
+</div>
+
+<div id="content">
+
+<!-- ABOUT -->
+<section class="cs" id="about">
+  <div class="tag fu">About the Project</div>
+  <div class="ag">
+    <div class="fu">
+      <img class="aphoto" src="https://scontent.fbkk22-2.fna.fbcdn.net/v/t1.15752-9/662075384_962829802915138_4136542181878456069_n.jpg?_nc_cat=106&ccb=1-7&_nc_sid=9f807c&_nc_eui2=AeHb7vjQEC8CWfPDRij1FDax0MbswxHEyN3QxuzDEcTI3RSBCrGUFZTMzVAjhrtg3s7jlQ58aNfUOHgdWXtjJ9ZF&_nc_ohc=X7555RA_QSMQ7kNvwEZeY78&_nc_oc=Adou657O3cFD-jHFQBiJ780gKqt-BLIknnZT42pmkhHN_Lb2gmVZZryFn5edNY9fMbc&_nc_zt=23&_nc_ht=scontent.fbkk22-2.fna&_nc_ss=7a3a8&oh=03_Q7cD5AFnO8MGHsJpsS7iPPPp6UEprgSEviDg9ymL3B8JuSgXYA&oe=69F8631B" alt="frozen yogurt">
+    </div>
+    <div class="atext fu">
+      <h2 class="st">What's This<br>Project About?</h2>
+      <p>This project is part of the Modern Management course, where students are encouraged to learn real business management and develop effective selling strategies.</p>
+      <p>As part of this hands-on experience, our group created and sold homemade yogurt to primary school students.</p>
+      <p>Through this project, we gained practical knowledge in planning, marketing, teamwork, and business operations.</p>
+      <div class="chips">
+        <span class="chip">📋 Business Planning</span>
+        <span class="chip s">🤝 Teamwork</span>
+        <span class="chip m">💰 Cost Management</span>
+        <span class="chip p">🛒 Customer Service</span>
+        <span class="chip">📊 Data Analysis</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ VIDEO ══ -->
+<section id="video" class="video-section">
+  <div class="tag fu">🎬 Behind the Scenes</div>
+  <h2 class="st fu">See Our Work<br><em>in Action</em></h2>
+  <p class="sd fu">Watch a video showcasing our team's workflow, from production to sales.</p>
+  <div class="video-wrap fu">
+    <video controls preload="metadata">
+      <!-- ✏️ แก้ตรงนี้: เปลี่ยน YOUR_VIDEO.mp4 เป็นชื่อไฟล์วิดีโอของคุณ -->
+      <source src="MM Project1.mp4" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
+  </div>
+</section>
+
+<!-- BMC -->
+<section class="cs" id="bmc" style="background:linear-gradient(160deg,#f7f4ff,#edf5ff)">
+  <div class="tag fu">Business Strategy</div>
+  <h2 class="st fu">Business Model Canvas</h2>
+  <p class="sd fu">A complete overview of our business model — from customers to costs.</p>
+  <div class="bmcg">
+    <div class="bc"><div class="bci">👥</div><div class="bct">1 · Customer Segments</div><div class="bch">Who Are We Serving?</div><div class="bcb"><ul><li>Students aged 5–15 (main target)</li><li>University students, teachers & staff</li><li>Walk-in customers</li></ul></div></div>
+    <div class="bc"><div class="bci">💎</div><div class="bct">2 · Value Proposition</div><div class="bch">Why Choose Us?</div><div class="bcb"><ul><li>Very affordable — 7 THB per cup</li><li>Homemade, clean & safe</li><li>Refreshing for hot weather</li><li>Healthier snack option</li><li>Suitable for Ramadan</li></ul></div></div>
+    <div class="bc"><div class="bci">📢</div><div class="bct">3 · Channels</div><div class="bch">How We Reach Customers</div><div class="bcb"><ul><li>School cooperatives (2 locations)</li><li>Direct selling at school</li><li>Pre-orders</li><li>Partner shops</li></ul></div></div>
+    <div class="bc"><div class="bci">💬</div><div class="bct">4 · Customer Relationships</div><div class="bch">How We Keep Customers</div><div class="bcb"><ul><li>Friendly & fast service</li><li>Word-of-mouth marketing</li><li>Customer feedback</li><li>Buy 3 for 20 ฿ · Buy 10 for 60 ฿</li></ul></div></div>
+    <div class="bc"><div class="bci">💵</div><div class="bct">5 · Revenue Streams</div><div class="bch">How We Earn</div><div class="bcb"><ul><li>Retail: 7 THB per cup</li><li>Wholesale: 6 THB per cup</li><li><strong>Total revenue: 8,014 THB</strong></li></ul></div></div>
+    <div class="bc"><div class="bci">⚙️</div><div class="bct">6 · Key Activities</div><div class="bch">What We Do</div><div class="bcb"><ul><li>Producing yogurt</li><li>Packaging</li><li>Freezing & storage</li><li>Selling & promotion</li></ul></div></div>
+    <div class="bc"><div class="bci">🧰</div><div class="bct">7 · Key Resources</div><div class="bch">What We Need</div><div class="bcb"><ul><li>Ingredients: milk, sugar, yogurt, jelly</li><li>Equipment: freezer, refrigerator, cups</li><li>Selling locations & team</li></ul></div></div>
+    <div class="bc"><div class="bci">🤝</div><div class="bct">8 · Key Partnerships</div><div class="bch">Who Supports Us</div><div class="bcb"><ul><li>School cooperatives</li><li>Partner shops & suppliers</li><li>Delivery helpers</li></ul></div></div>
+    <div class="bc"><div class="bci">📉</div><div class="bct">9 · Cost Structure</div><div class="bch">What We Spend</div><div class="bcb"><ul><li><strong>Total cost: 4,688 THB</strong></li><li>Materials & packaging</li><li>Electricity & transportation</li></ul></div></div>
+  </div>
+</section>
+
+<!-- PROCESS -->
+<section class="cs" id="process">
+  <div class="tag fu">How We Did It</div>
+  <h2 class="st fu">Our Process</h2>
+  <p class="sd fu">From idea to product — four clear steps.</p>
+  <div class="pr">
+    <div class="ps"><div class="pn">1</div><div class="pe">💡</div><div class="pti">Idea Generation</div><div class="pde">Identified a gap for affordable cool snacks in the school environment.</div></div>
+    <div class="pc">→</div>
+    <div class="ps"><div class="pn">2</div><div class="pe">🛒</div><div class="pti">Preparation</div><div class="pde">Sourced ingredients and equipment. Planned production and budget carefully.</div></div>
+    <div class="pc">→</div>
+    <div class="ps"><div class="pn">3</div><div class="pe">🏭</div><div class="pti">Production</div><div class="pde">Made the yogurt, packaged into cups, and froze for delivery to selling points.</div></div>
+    <div class="pc">→</div>
+    <div class="ps"><div class="pn">4</div><div class="pe">🛍️</div><div class="pti">Selling</div><div class="pde">Sold at cooperatives, direct, and pre-orders.</div></div>
+  </div>
+  <div style="margin-top:64px">
+    <div class="tag fu">⚠️ Challenges</div>
+    <h2 class="st fu" style="font-size:1.85rem">Problems & Solutions</h2>
+    <div class="prg">
+      <div class="prc"><div class="pl pp">⚠️ Problem 1</div><div class="prt">Product Melts Too Fast</div><div class="prd">Temperature control was difficult during transport and selling hours.</div><div class="par">↓</div><div class="pl ps">✅ Solution</div><div class="prd">Used cooler boxes and improved storage to maintain product temperature longer.</div></div>
+      <div class="prc"><div class="pl pp">⚠️ Problem 2</div><div class="prt">Insufficient Stock</div><div class="prd">Demand exceeded our production capacity on some days.</div><div class="par">↓</div><div class="pl ps">✅ Solution</div><div class="prd">Increased production batches and planned ahead based on demand forecasting.</div></div>
+      <div class="prc"><div class="pl pp">⚠️ Problem 3</div><div class="prt">Insufficient Refrigerator Space</div><div class="prd">Refrigerator space was not enough to store all yogurt stock properly.</div><div class="par">↓</div><div class="pl ps">✅ Solution</div><div class="prd">Expanded refrigerator space to store more yogurt and maintain proper temperature.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- DATA -->
+<section class="cs" id="data" style="background:linear-gradient(160deg,#f7f4ff,#edf5ff)">
+  <div class="tag fu">Financial Results</div>
+  <h2 class="st fu">Data & Analysis</h2>
+  <p class="sd fu">Our project generated real profit from a modest initial investment.</p>
+  <div class="fcs">
+    <div class="fc"><div class="fi">💰</div><div class="fl">Initial Investment</div><div class="fv">4,000</div><div class="fs">4 members × 1,000 THB</div></div>
+    <div class="fc"><div class="fi">📈</div><div class="fl">Total Revenue</div><div class="fv">8,014</div><div class="fs">THB earned</div></div>
+    <div class="fc"><div class="fi">📦</div><div class="fl">Total Expenses</div><div class="fv">4,688</div><div class="fs">THB spent</div></div>
+    <div class="fc"><div class="fi">🎉</div><div class="fl">Net Profit</div><div class="fv">3,326</div><div class="fs">~831 THB per person</div></div>
+  </div>
+  <div class="chrow">
+    <div class="chc fu"><div class="cht">Revenue vs Expenses vs Profit</div><div class="chs">Overall financial performance (THB)</div><canvas id="barChart" style="max-height:280px"></canvas></div>
+    <div class="chc fu"><div class="cht">Cost Breakdown</div><div class="chs">Allocation of total expenses</div><canvas id="pieChart" style="max-height:280px"></canvas></div>
+  </div>
+</section>
+
+<!-- FUTURE -->
+<section class="cs" id="future">
+  <div class="tag fu">What's Next</div>
+  <h2 class="st fu">Future Plans</h2>
+  <p class="sd fu">We plan to grow our business with these exciting next steps.</p>
+  <div class="fg">
+    <div class="fucard fu"><div class="fue">🍓</div><div class="fut">Add More Flavors</div><div class="fud">Expand the menu with strawberry, mango, blueberry, and seasonal flavors.</div></div>
+    <div class="fucard fu"><div class="fue">🧆</div><div class="fut">Introduce Toppings</div><div class="fud">Offer granola, fruits, and syrup toppings for a more customizable experience.</div></div>
+    <div class="fucard fu"><div class="fue">🏫</div><div class="fut">Expand to More Schools</div><div class="fud">Scale the business to neighboring schools and institutions.</div></div>
+    <div class="fucard fu"><div class="fue">⚡</div><div class="fut">Increase Capacity</div><div class="fud">Invest in additional equipment to produce larger batches efficiently.</div></div>
+    <div class="fucard fu"><div class="fue">📱</div><div class="fut">Promote Online</div><div class="fud">Use social media to reach a wider customer base and take digital orders.</div></div>
+  </div>
+</section>
+
+<!-- TEAM -->
+<section class="cs" id="team" style="background:linear-gradient(160deg,#f7f4ff,#edf5ff)">
+  <div class="tag fu">Meet the Team</div>
+  <h2 class="st fu">Team Members</h2>
+  <p class="sd fu">Presented by four dedicated student entrepreneurs.</p>
+  <div class="tg">
+    <div class="mc"><img class="mphoto" src="https://scontent.fbkk29-8.fna.fbcdn.net/v/t1.15752-9/665904226_2173982036748549_5491826240167452548_n.jpg?_nc_cat=102&ccb=1-7&_nc_sid=9f807c&_nc_eui2=AeGbgSUbaFK-ZoCJO-vJxdc104QAJMRCmYLThAAkxEKZgggzcv7VG36uMjjFAAPpvgOPfJ7kMDdWaIvd8uSZNlnZ&_nc_ohc=ycn1mevdxLIQ7kNvwE34hSC&_nc_oc=AdqOSl2JGUw_DYcZSfrZ2nfnn4GOyHGs-1p6XwI2gkBiT7XW01ANYFRKvOKa_FkKEuU&_nc_zt=23&_nc_ht=scontent.fbkk29-8.fna&_nc_ss=7a3a8&oh=03_Q7cD5AGcnDG_P4KKDla9whbQnL1Z9a6jakzdu-AG_s84D39EsA&oe=69F993BB" alt="member"><div class="minfo"><div class="mid-txt">662431015</div><div class="mname">Aswanee Saneeyeng</div></div></div>
+    <div class="mc"><img class="mphoto" src="https://scontent.fbkk29-9.fna.fbcdn.net/v/t1.15752-9/664956782_952680973912576_5292052749929387886_n.jpg?_nc_cat=104&ccb=1-7&_nc_sid=9f807c&_nc_eui2=AeFM3jw9IQtdN7xw_-0UCFibhAe89mWovB-EB7z2Zai8H_wWnknxPV1lG-44VmOoLgi97Jjb6FBHGnV9w7s_TN-R&_nc_ohc=fYAEOLQ9_UoQ7kNvwGCnZC6&_nc_oc=AdoI4YP6rlUcCy4UT9HNK08b5ec5K5wJFk3JnMVqFrCmmKaDqjOT3Tk8xppw0VbRtNk&_nc_zt=23&_nc_ht=scontent.fbkk29-9.fna&_nc_ss=7a3a8&oh=03_Q7cD5AG1bwL9J9bBN_3QoSFDhv9r4YrjxCmaoFGyiv9UoedinQ&oe=69F9AF00" alt="member"><div class="minfo"><div class="mid-txt">662431016</div><div class="mname">Murshida Saifulislam</div></div></div>
+    <div class="mc"><img class="mphoto" src="https://scontent.fbkk29-5.fna.fbcdn.net/v/t1.15752-9/665822421_1736738060644224_4253543203746436710_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=9f807c&_nc_eui2=AeH8EXC1wfXZn6ZpzjG5cWJZEQxrTQjSnEkRDGtNCNKcScrm_zqo42Tev99v6FBolOnaZ1CDnpsz0TroL9s3zcKT&_nc_ohc=-ZUiZd4utwMQ7kNvwFuRRYw&_nc_oc=Ado6ChQhFXU0W0ooE30yrJ9HtR5sS9ansYPrSjDhjruokiy1bLl7AbNa9SE4fTQTrFA&_nc_zt=23&_nc_ht=scontent.fbkk29-5.fna&_nc_ss=7a3a8&oh=03_Q7cD5AEooJPcIfCuj3mfxU-oansoCDJ-OWC46Yot9WL5m0Mgug&oe=69F98894" alt="member"><div class="minfo"><div class="mid-txt">662431019</div><div class="mname">Nisreen Seeba</div></div></div>
+    <div class="mc"><img class="mphoto" src="https://scontent.fbkk29-8.fna.fbcdn.net/v/t1.15752-9/665700752_1624710652177183_1588349700487290432_n.jpg?_nc_cat=105&ccb=1-7&_nc_sid=9f807c&_nc_eui2=AeGWewvsB17G3CVA1TYtpyS5HsHg-6SYgyUeweD7pJiDJblT5C2KjM6qb9ppMXMaqrz-tJUR-WW95FPggol7X6xZ&_nc_ohc=4P_4i3oL2yAQ7kNvwHvM82-&_nc_oc=AdpeoJ4e92wyh1JhpZMk3B2TKPKnazHyV-KFDGAN6R_tOwGMPE07TUCyZt5O0LqKAXY&_nc_zt=23&_nc_ht=scontent.fbkk29-8.fna&_nc_ss=7a3a8&oh=03_Q7cD5AGikieN6z95E6EkkN4OCR6jOy4TX-ZMwJQcjNnkNBBe2A&oe=69F97DBB" alt="member"><div class="minfo"><div class="mid-txt">672431011</div><div class="mname">Amanee Sitae</div></div></div>
+  </div>
+</section>
+
+<!-- CONCLUSION -->
+<section id="conclusion">
+  <div class="tag">Takeaways</div>
+  <h2 class="st">Conclusion</h2>
+  <p class="sd">This project proves that a small-scale business with low investment can generate real profit when backed by planning, teamwork, and data-driven decisions.</p>
+  <div class="cg">
+    <div class="cpt"><div class="cpe">📋</div><div class="cpt-t">Planning Matters</div><div class="cpt-d">Careful business planning and cost control were key drivers of our profitability.</div></div>
+    <div class="cpt"><div class="cpe">🤝</div><div class="cpt-t">Teamwork Works</div><div class="cpt-d">Each member contributed uniquely — from production to marketing and data analysis.</div></div>
+    <div class="cpt"><div class="cpe">💻</div><div class="cpt-t">IT + Business</div><div class="cpt-d">Applying IT knowledge to present and analyze business data enhanced our results.</div></div>
+  </div>
+</section>
+
+</div>
+<footer>© 2026 Homemade Yogurt Business Project · Modern Management Project</footer>
+
+<script>
+history.scrollRestoration = 'manual';
+window.scrollTo(0, 0);
+history.replaceState(null, '', window.location.pathname);
+
+const TOTAL = 5;
+let cur = 0, animating = false;
+const slides = Array.from({length: TOTAL}, (_, i) => document.getElementById('s' + i));
+const dotsWrap = document.getElementById('dotsWrap');
+const sCount = document.getElementById('sCount');
+const progressBar = document.getElementById('progress');
+
+for (let i = 0; i < TOTAL; i++) {
+  const d = document.createElement('div');
+  d.className = 'dot' + (i === 0 ? ' on' : '');
+  d.addEventListener('click', () => goTo(i));
+  dotsWrap.appendChild(d);
+}
+
+function goTo(n) {
+  if (animating || n === cur) return;
+  animating = true;
+  const prev = cur; cur = ((n % TOTAL) + TOTAL) % TOTAL;
+  slides[prev].classList.add('exit');
+  slides[prev].classList.remove('active');
+  slides[cur].classList.add('active');
+  dotsWrap.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('on', i === cur));
+  sCount.textContent = (cur + 1) + ' / ' + TOTAL;
+  resetProgress();
+  setTimeout(() => { slides[prev].classList.remove('exit'); animating = false; }, 680);
+}
+
+const DURATION = 6000;
+let progStart = null, progAnim = null;
+function resetProgress() {
+  if (progAnim) cancelAnimationFrame(progAnim);
+  progStart = null;
+  progressBar.style.width = '0%';
+  tick();
+}
+function tick(ts) {
+  if (!progStart) progStart = ts;
+  const pct = Math.min(((ts - progStart) / DURATION) * 100, 100);
+  progressBar.style.width = pct + '%';
+  if (pct < 100) { progAnim = requestAnimationFrame(tick); }
+  else { goTo(cur + 1); }
+}
+resetProgress();
+
+document.getElementById('nextBtn').addEventListener('click', () => goTo(cur + 1));
+document.getElementById('prevBtn').addEventListener('click', () => goTo(cur - 1));
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight') goTo(cur + 1);
+  if (e.key === 'ArrowLeft') goTo(cur - 1);
+});
+let tx = 0;
+document.getElementById('hero').addEventListener('touchstart', e => tx = e.touches[0].clientX, {passive: true});
+document.getElementById('hero').addEventListener('touchend', e => {
+  const dx = e.changedTouches[0].clientX - tx;
+  if (Math.abs(dx) > 48) goTo(dx < 0 ? cur + 1 : cur - 1);
+});
+
+const navbar = document.getElementById('navbar');
+window.addEventListener('scroll', () => {
+  navbar.classList.toggle('scrolled', window.scrollY > 20);
+  document.querySelectorAll('.nav-links a').forEach(a => {
+    const id = a.getAttribute('href').replace('#', '');
+    const sec = document.getElementById(id);
+    if (!sec) return;
+    const r = sec.getBoundingClientRect();
+    a.classList.toggle('active', r.top <= 80 && r.bottom > 80);
+  });
+});
+document.getElementById('navToggle').addEventListener('click', () => {
+  document.getElementById('navLinks').classList.toggle('open');
+});
+document.querySelectorAll('.nav-links a').forEach(a => {
+  a.addEventListener('click', () => document.getElementById('navLinks').classList.remove('open'));
+});
+
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (!e.isIntersecting) return;
+    e.target.classList.add('vi');
+    e.target.querySelectorAll('.bc,.fc,.mc,.prc,.fucard,.ps').forEach((c, i) => {
+      setTimeout(() => c.classList.add('vi'), i * 72);
+    });
+  });
+}, {threshold: 0.1});
+document.querySelectorAll('.fu, section.cs, #conclusion, .video-section').forEach(el => io.observe(el));
+
+new Chart(document.getElementById('barChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Investment', 'Revenue', 'Expenses', 'Net Profit'],
+    datasets: [{
+      data: [4000, 8014, 4688, 3326],
+      backgroundColor: ['rgba(179,217,247,.75)','rgba(184,237,216,.75)','rgba(247,213,196,.75)','rgba(197,184,240,.75)'],
+      borderColor: ['#6eb5f5','#5ccba0','#f0916b','#a08de8'],
+      borderWidth: 2, borderRadius: 10
+    }]
+  },
+  options: {
+    responsive: true, plugins: {legend: {display: false}},
+    scales: {
+      y: {beginAtZero: true, grid: {color: 'rgba(0,0,0,.05)'}, ticks: {font: {family: 'DM Sans'}}},
+      x: {grid: {display: false}, ticks: {font: {family: 'DM Sans'}}}
+    }
+  }
+});
+new Chart(document.getElementById('pieChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Materials', 'Packaging', 'Electricity', 'Transportation'],
+    datasets: [{
+      data: [2500, 900, 688, 600],
+      backgroundColor: ['rgba(197,184,240,.8)','rgba(179,217,247,.8)','rgba(184,237,216,.8)','rgba(247,213,196,.8)'],
+      borderColor: ['#a08de8','#6eb5f5','#5ccba0','#f0916b'],
+      borderWidth: 2, hoverOffset: 10
+    }]
+  },
+  options: {
+    responsive: true, cutout: '62%',
+    plugins: {legend: {position: 'bottom', labels: {font: {family: 'DM Sans', size: 12}, padding: 16}}}
+  }
+});
+
+slides.forEach((s, i) => {
+  s.classList.remove('active', 'exit');
+  if (i === 0) s.classList.add('active');
+});
+cur = 0;
+dotsWrap.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('on', i === 0));
+sCount.textContent = '1 / ' + TOTAL;
+resetProgress();
+</script>
+</body>
+</html>
